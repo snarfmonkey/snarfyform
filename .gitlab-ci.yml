@@ -1,0 +1,49 @@
+image:
+  name: flightstats/it:gitlab-runner-tfenv-v1
+  entrypoint:
+    - '/usr/bin/env'
+
+# Default output file for Terraform plan
+variables:
+  PLAN: plan.tfplan
+
+cache:
+  paths:
+    - .terraform
+
+## add path for tfenv
+before_script:
+  - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/runner/.tfenv/bin
+  - test -f .terraform-version && tfenv install `cat .terraform-version`
+  - terraform version
+  - terraform init
+
+stages:
+  - validateAndPlan
+  - deploy
+
+validate:
+  stage: validateAndPlan
+  script:
+    - terraform version
+    - terraform validate
+    - terraform plan -out=$PLAN
+  artifacts:
+    name: plan
+    paths:
+      - $PLAN
+
+
+# Separate apply job for manual launching Terraform as it can be destructive
+# action.
+apply:
+  stage: deploy
+  environment:
+    name: production
+  script:
+    - terraform apply -input=false $PLAN
+  dependencies:
+    - validate
+  when: manual
+  only:
+    - master

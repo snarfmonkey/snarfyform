@@ -1,5 +1,7 @@
 # Template for Terraform in our Pipeline
 
+![Terraform GitHub Actions](https://github.com/snarfmonkey/snarfyform/workflows/Terraform%20GitHub%20Actions/badge.svg)
+
 This is just a quick generic reference to use as a starting place for a new repo of terraform code. None of this is canon, and you
 don't need to use it, but it highlights some things that are common to all of our pipeline repos:
 
